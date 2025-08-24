@@ -10,6 +10,8 @@ import { Footer } from './components/Footer';
 import { AdminDashboard } from './components/AdminDashboard';
 import { ArticlePage } from './components/ArticlePage';
 import { AdminLogin } from './components/AdminLogin';
+import { ContactModal } from './components/ContactModal';
+import { AboutSection } from './components/AboutSection';
 
 // Check if user is authenticated as admin
 const isAdminAuthenticated = (): boolean => {
@@ -33,25 +35,59 @@ const isAdminAuthenticated = (): boolean => {
 
 const HomePage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get('search') || '';
-  const categoryFilter = searchParams.get('category') || '';
-  const featuredOnly = searchParams.get('featured') === 'true';
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [filters, setFilters] = useState({
+    search: searchParams.get('search') || '',
+    category: searchParams.get('category') || '',
+    featured: searchParams.get('featured') === 'true'
+  });
 
+  // Update filters when URL changes
+  React.useEffect(() => {
+    const handlePopState = () => {
+      const newSearchParams = new URLSearchParams(window.location.search);
+      setFilters({
+        search: newSearchParams.get('search') || '',
+        category: newSearchParams.get('category') || '',
+        featured: newSearchParams.get('featured') === 'true'
+      });
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const handleSearch = (query: string) => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    if (query) {
-      newSearchParams.set('search', query);
-    } else {
-      newSearchParams.delete('search');
-    }
-    window.history.pushState({}, '', `?${newSearchParams.toString()}`);
-    window.location.reload(); // Simple way to trigger re-render with new params
+    setFilters({
+      search: query,
+      category: '',
+      featured: false
+    });
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setFilters({
+      search: '',
+      category: category,
+      featured: false
+    });
+  };
+
+  const handleShowContact = () => {
+    setShowContactModal(true);
   };
 
   return (
     <>
+      <Header 
+        onSearch={handleSearch}
+        onCategoryFilter={handleCategoryFilter}
+        onShowContact={handleShowContact}
+      />
       <Hero />
-      {!searchQuery && !categoryFilter && !featuredOnly && <CategoryGrid />}
+      {!filters.search && !filters.category && !filters.featured && (
+        <CategoryGrid onCategorySelect={handleCategoryFilter} />
+      )}
+      {!filters.search && !filters.category && !filters.featured && <AboutSection />}
       
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -59,9 +95,9 @@ const HomePage: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <BlogGrid 
-              searchQuery={searchQuery}
-              categoryFilter={categoryFilter}
-              featuredOnly={featuredOnly}
+              searchQuery={filters.search}
+              categoryFilter={filters.category}
+              featuredOnly={filters.featured}
             />
           </div>
           
@@ -73,6 +109,10 @@ const HomePage: React.FC = () => {
       </div>
       
       <Newsletter />
+      <ContactModal 
+        isOpen={showContactModal} 
+        onClose={() => setShowContactModal(false)} 
+      />
     </>
   );
 };
@@ -86,10 +126,11 @@ function App() {
     setIsAdminMode(isAdminAuthenticated());
   }, []);
 
-  // Admin access shortcut (Ctrl+Shift+A)
+  // Admin access shortcut (Ctrl+Shift+A) - Only for development
   React.useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+      // Only enable admin shortcut in development mode
+      if (e.ctrlKey && e.shiftKey && e.key === 'A' && import.meta.env.DEV) {
         if (isAdminAuthenticated()) {
           setIsAdminMode(!isAdminMode);
         } else {
@@ -153,7 +194,6 @@ function App() {
         <Header onSearch={(query) => {
           const newUrl = `/?search=${encodeURIComponent(query)}`;
           window.location.href = newUrl;
-        }} />
         
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -162,15 +202,15 @@ function App() {
         
         <Footer />
         
-        {/* Admin Access Hint - Only show if not authenticated */}
-        {!isAdminAuthenticated() && (
+        {/* Admin Access Hint - Only show in development mode */}
+        {import.meta.env.DEV && !isAdminAuthenticated() && (
           <div className="fixed bottom-4 right-4 text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
             Ctrl+Shift+A for admin
           </div>
         )}
         
-        {/* Admin Mode Indicator */}
-        {isAdminAuthenticated() && (
+        {/* Admin Mode Indicator - Only show in development mode */}
+        {import.meta.env.DEV && isAdminAuthenticated() && (
           <div className="fixed bottom-4 right-4 text-xs text-cyan-400 bg-gray-800 px-2 py-1 rounded border border-cyan-400">
             Admin authenticated - Ctrl+Shift+A for dashboard
           </div>

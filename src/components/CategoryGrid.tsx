@@ -1,16 +1,37 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { categories } from '../data/categories';
 
-export const CategoryGrid: React.FC = () => {
-  const navigate = useNavigate();
+interface CategoryGridProps {
+  onCategorySelect?: (categoryId: string) => void;
+}
 
+export const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
   const handleCategoryClick = (categoryId: string) => {
-    navigate(`/?category=${categoryId}`);
+    if (onCategorySelect) {
+      onCategorySelect(categoryId);
+    }
+    
+    // Update URL
+    const url = new URL(window.location.href);
+    url.searchParams.set('category', categoryId);
+    url.searchParams.delete('search');
+    url.searchParams.delete('featured');
+    window.history.pushState({}, '', url.toString());
+    
+    // Trigger page update
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    
+    // Scroll to blog section
+    setTimeout(() => {
+      const blogSection = document.getElementById('blog-section');
+      if (blogSection) {
+        blogSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
   };
 
   return (
-    <div className="py-16 bg-gray-800">
+    <div id="categories-section" className="py-16 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
