@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { categories } from '../data/categories';
 
 export const CategoryGrid: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryId: string) => {
+    navigate(`/?category=${categoryId}`);
+  };
+
   return (
     <div className="py-16 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,6 +25,7 @@ export const CategoryGrid: React.FC = () => {
           {categories.map((category) => (
             <div
               key={category.id}
+              onClick={() => handleCategoryClick(category.id)}
               className="group relative bg-gray-900 rounded-xl p-6 border border-gray-700 hover:border-cyan-400 transition-all duration-300 cursor-pointer overflow-hidden"
             >
               {/* Background gradient effect */}

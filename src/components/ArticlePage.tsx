@@ -153,6 +153,24 @@ export const ArticlePage: React.FC = () => {
                     <Share2 className="h-5 w-5" />
                     <span>Share Article</span>
                   </button>
+                  <button 
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: post.title,
+                          text: post.excerpt,
+                          url: window.location.href,
+                        });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('Article URL copied to clipboard!');
+                      }
+                    }}
+                    className="flex items-center space-x-2 text-cyan-400 hover:text-cyan-300 transition-colors duration-200"
+                  >
+                    <Share2 className="h-5 w-5" />
+                    <span>Share Article</span>
+                  </button>
                 </div>
 
                 {/* Tags */}
@@ -204,10 +222,22 @@ export const ArticlePage: React.FC = () => {
                     <span>Found this article helpful? Share it with others!</span>
                   </div>
                   <div className="flex space-x-4">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200">
+                    <button 
+                      onClick={() => {
+                        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(window.location.href)}`;
+                        window.open(twitterUrl, '_blank');
+                      }}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors duration-200"
+                    >
                       Share on Twitter
                     </button>
-                    <button className="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    <button 
+                      onClick={() => {
+                        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+                        window.open(facebookUrl, '_blank');
+                      }}
+                      className="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
                       Share on Facebook
                     </button>
                   </div>

@@ -1,7 +1,23 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Target, TrendingUp, Users, Award } from 'lucide-react';
 
 export const Hero: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleExploreClick = () => {
+    // Scroll to blog section or navigate to articles
+    const blogSection = document.getElementById('blog-section');
+    if (blogSection) {
+      blogSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleSubmitMythClick = () => {
+    // In a real app, this would open a form or navigate to a submission page
+    alert('Myth submission feature coming soon! Email us at submit@ybymythbust.com');
+  };
+
   return (
     <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-cyan-900 py-20 overflow-hidden">
       {/* Background Effects */}
@@ -32,10 +48,16 @@ export const Hero: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-lg hover:from-cyan-400 hover:to-blue-400 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+            <button 
+              onClick={handleExploreClick}
+              className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-lg hover:from-cyan-400 hover:to-blue-400 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
               Explore Latest Myths
             </button>
-            <button className="px-8 py-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-gray-600 transition-all duration-200">
+            <button 
+              onClick={handleSubmitMythClick}
+              className="px-8 py-4 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-700 border border-gray-700 hover:border-gray-600 transition-all duration-200"
+            >
               Submit a Myth
             </button>
           </div>

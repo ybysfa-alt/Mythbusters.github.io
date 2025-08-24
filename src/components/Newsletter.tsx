@@ -8,6 +8,8 @@ export const Newsletter: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
+      // In a real app, this would send the email to your backend
+      console.log('Subscribing email:', email);
       setSubscribed(true);
       setEmail('');
       setTimeout(() => setSubscribed(false), 3000);
